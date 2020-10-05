@@ -1,0 +1,18 @@
+{
+  "name": "soeminnminn.github.io",
+  "version": "1.0.0",
+  "description": "Portfolio website",
+  "scripts": {
+    "start": "node ./bin/serve --dir .",
+    "test": "mocha --exit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/soeminnminn/soeminnminn.github.io"
+  },
+  "keywords": [
+    "portfolio"
+  ],
+  "author": "Soe Minn Minn",
+  "license": "ISC"
+}
