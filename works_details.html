@@ -22,9 +22,9 @@
     <div class="container">
       <a class="navbar-brand" href="/">
         <svg class="bi" width="1.4em" height="1.4em" fill="currentColor">
-          <use xlink:href="./images/bootstrap-icons.svg#house-fill"></use>
+          <use xlink:href="./images/bootstrap-icons.svg#arrow-left-circle"></use>
         </svg>
-        Home
+        Back
       </a>
     </div>
   </nav>
@@ -252,7 +252,20 @@
     </div>
   </div>
 
+  <div class="top-scrollerx js-top-scrollerx btn btn-secondary rounded-circle">
+    <svg class="bi" width="3em" height="3em" fill="currentColor">
+      <use xlink:href="./images/bootstrap-icons.svg#arrow-up-short"></use>
+    </svg>
+  </div>
+
   <script src="./js/jquery-3.5.1.min.js"></script>
   <script src="./js/popper-1.16.0.min.js"></script>
   <script src="./js/bootstrap.min.js"></script>
+  <script src="./js/script.js"></script>
+  <script>
+    // Document on load.
+    $(function () {
+      topScroller();
+    });
+    </script>
 </body>
