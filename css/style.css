@@ -659,6 +659,13 @@ ul.timeline>li:before {
   margin-top: calc(25% - 2.5rem);
 }
 
+.section-work .work-card .work-logo.portrait {
+  margin-top: calc(50% - 7rem);
+}
+.work-logo.portrait img {
+  max-height: 15rem;
+}
+
 /* section-products */
 .section-products  .card {
   margin-top: 8em;
