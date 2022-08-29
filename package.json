@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Portfolio website",
   "scripts": {
-    "start": "node ./bin/serve --dir . --port 5000",
+    "start": "node ./bin/serve --dir .",
     "test": "mocha --exit"
   },
   "repository": {

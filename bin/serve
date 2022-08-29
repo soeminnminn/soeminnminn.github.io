@@ -556,46 +556,49 @@ function parseEnv(root) {
   }
   const dotenvPath = path.resolve(root, '.env');
   
-  const encoding = 'utf8'
+  const encoding = 'utf8';
   const LINE = /(?:^|^)\s*(?:export\s+)?([\w.-]+)(?:\s*=\s*?|:\s+?)(\s*'(?:\\'|[^'])*'|\s*"(?:\\"|[^"])*"|\s*`(?:\\`|[^`])*`|[^#\r\n]+)?\s*(?:#.*)?(?:$|$)/mg;
 
   try {
-    const src = fs.readFileSync(dotenvPath, { encoding });
     const obj = {};
 
-    // Convert buffer to string
-    let lines = src.toString();
+    if (fs.existsSync(dotenvPath)) {
+      const src = fs.readFileSync(dotenvPath, { encoding });
 
-    // Convert line breaks to same format
-    lines = lines.replace(/\r\n?/mg, '\n');
+      // Convert buffer to string
+      let lines = src.toString();
 
-    let match;
-    while ((match = LINE.exec(lines)) != null) {
-      const key = match[1];
+      // Convert line breaks to same format
+      lines = lines.replace(/\r\n?/mg, '\n');
 
-      // Default undefined or null to empty string
-      let value = (match[2] || '');
+      let match;
+      while ((match = LINE.exec(lines)) != null) {
+        const key = match[1];
 
-      // Remove whitespace
-      value = value.trim();
+        // Default undefined or null to empty string
+        let value = (match[2] || '');
 
-      // Check if double quoted
-      const maybeQuote = value[0];
+        // Remove whitespace
+        value = value.trim();
 
-      // Remove surrounding quotes
-      value = value.replace(/^(['"`])([\s\S]*)\1$/mg, '$2');
+        // Check if double quoted
+        const maybeQuote = value[0];
 
-      // Expand newlines if double quoted
-      if (maybeQuote === '"') {
-        value = value.replace(/\\n/g, '\n');
-        value = value.replace(/\\r/g, '\r');
+        // Remove surrounding quotes
+        value = value.replace(/^(['"`])([\s\S]*)\1$/mg, '$2');
+
+        // Expand newlines if double quoted
+        if (maybeQuote === '"') {
+          value = value.replace(/\\n/g, '\n');
+          value = value.replace(/\\r/g, '\r');
+        }
+
+        // Add to object
+        obj[key] = value;
       }
-
-      // Add to object
-      obj[key] = value;
     }
 
-    if (!process.env) {
+    if (process.env && typeof(process.env) == 'object') {
       Object.keys(process.env).forEach(function (key) {
         if (!Object.prototype.hasOwnProperty.call(obj, key)) {
           obj[key] = process.env[key];
@@ -612,9 +615,10 @@ function parseEnv(root) {
 
 (function main() {
   const env = parseEnv();
+
   const argsSchema = {
     port: { 'default': env.PORT || 3000, 'keys': ['-p', '--port'], 'match': /^[\d]+$/ },
-    dir: { 'default': env.DIR || 'public', 'keys': ['-d', '--dir'], 'match': /^[^\s]+$/ }
+    dir: { 'default': env.PUBLIC_DIR || env.SERVE_DIR || 'public', 'keys': ['-d', '--dir'], 'match': /^[^\s]+$/ }
   };
 
   const parsedArgs = parseArgs(argsSchema);
