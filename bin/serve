@@ -433,7 +433,7 @@ class Serve {
       const dirPath = path.normalize(path.join(rootPath, dir));
       if (!!~dirPath.indexOf('\0')) return next(error(400));
 
-      if ((dirPath + path.sep).substr(0, rootPath.length) !== rootPath) {
+      if ((dirPath + path.sep).substring(0, rootPath.length) !== rootPath) {
         return next(error(403));
       }
 
@@ -550,10 +550,71 @@ function parseArgs(schema) {
   }, args);
 }
 
+function parseEnv(root) {
+  if (!root) {
+    root = process.cwd();
+  }
+  const dotenvPath = path.resolve(root, '.env');
+  
+  const encoding = 'utf8'
+  const LINE = /(?:^|^)\s*(?:export\s+)?([\w.-]+)(?:\s*=\s*?|:\s+?)(\s*'(?:\\'|[^'])*'|\s*"(?:\\"|[^"])*"|\s*`(?:\\`|[^`])*`|[^#\r\n]+)?\s*(?:#.*)?(?:$|$)/mg;
+
+  try {
+    const src = fs.readFileSync(dotenvPath, { encoding });
+    const obj = {};
+
+    // Convert buffer to string
+    let lines = src.toString();
+
+    // Convert line breaks to same format
+    lines = lines.replace(/\r\n?/mg, '\n');
+
+    let match;
+    while ((match = LINE.exec(lines)) != null) {
+      const key = match[1];
+
+      // Default undefined or null to empty string
+      let value = (match[2] || '');
+
+      // Remove whitespace
+      value = value.trim();
+
+      // Check if double quoted
+      const maybeQuote = value[0];
+
+      // Remove surrounding quotes
+      value = value.replace(/^(['"`])([\s\S]*)\1$/mg, '$2');
+
+      // Expand newlines if double quoted
+      if (maybeQuote === '"') {
+        value = value.replace(/\\n/g, '\n');
+        value = value.replace(/\\r/g, '\r');
+      }
+
+      // Add to object
+      obj[key] = value;
+    }
+
+    if (!process.env) {
+      Object.keys(process.env).forEach(function (key) {
+        if (!Object.prototype.hasOwnProperty.call(obj, key)) {
+          obj[key] = process.env[key];
+        }
+      });
+    }
+
+    return obj;
+
+  } catch (e) {
+    return { error: e };
+  }
+}
+
 (function main() {
+  const env = parseEnv();
   const argsSchema = {
-    port: { 'default': 3000, 'keys': ['-p', '--port'], 'match': /^[\d]+$/ },
-    dir: { 'default': 'public', 'keys': ['-d', '--dir'], 'match': /^[^\s]+$/ }
+    port: { 'default': env.PORT || 3000, 'keys': ['-p', '--port'], 'match': /^[\d]+$/ },
+    dir: { 'default': env.DIR || 'public', 'keys': ['-d', '--dir'], 'match': /^[^\s]+$/ }
   };
 
   const parsedArgs = parseArgs(argsSchema);

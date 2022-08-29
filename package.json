@@ -14,5 +14,8 @@
     "portfolio"
   ],
   "author": "Soe Minn Minn",
-  "license": "ISC"
+  "license": "ISC",
+  "engines": {
+    "node": "14.x"
+  }
 }
